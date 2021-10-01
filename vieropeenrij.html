@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <input type="hidden" id="speelbeurt" value="1">
+
+        <title>4 op 'n rij</title>
+        
+        <style>
+
+            .center{
+                margin: auto;
+                text-align: center;
+                font-size: 48px;
+                color: white;
+                background-color: black;
+                width: 20%;
+                font-family: sans-serif;
+            }
+
+            #winst{
+                margin: auto;
+                text-align: center;
+                font-size: 24px;
+                width: 40%;
+                font-family: sans-serif;
+            }
+
+            td, tr{
+                border: 2px solid black;
+                width: 60px;
+                height: 60px;
+                color: white;
+            }
+
+            table{
+                margin-left: auto;
+                margin-right: auto;
+                border-collapse: collapse;
+                user-select:  none;
+            }
+
+            span{
+                background-color: white;
+                border-radius: 50%;
+                display:inline-block;
+                height: 45px;
+                width: 45px;
+                text-align: center;
+            }
+        </style>
+
+        <script>
+            function markeren(columnname,circlename){
+                var cells = document.getElementsByClassName(columnname);
+                var circles = document.getElementsByClassName(circlename)
+
+                for (i=0;i<cells.length;i++){
+                    if (circles[i].innerHTML==0){
+                        cells[i].style.backgroundColor = "grey";    
+                        cells[i].style.opacity = 0.2; 
+
+                        circles[i].style.backgroundColor = "grey";
+                        circles[i].style.color = "grey";
+                    }
+                }
+            }
+
+            function schoonmaken(columnname, circlename){
+                var cells = document.getElementsByClassName(columnname);
+                var circles = document.getElementsByClassName(circlename)
+                
+                for (i=0;i<cells.length;i++){
+                    cells[i].style.backgroundColor = "white";   
+
+                    if (circles[i].innerHTML==0){
+                        circles[i].style.backgroundColor = "white";
+                        circles[i].style.color = "white";
+                    }
+                }
+            }
+
+            function steenwerpen(columnname, circlename){
+                var cells = document.getElementsByClassName(columnname);
+                var circles = document.getElementsByClassName(circlename);
+
+                var i = 5;
+                var steen = 1;
+
+                speelbeurt = document.getElementById("speelbeurt");
+
+                while (steen>0){
+
+                    steen = circles[i].innerHTML;
+
+                    if (steen ==0){
+                        cells[i].style.backgroundColor = "white"; 
+                        cells[i].style.opacity = 100;
+
+                        if (speelbeurt.value==1){
+                            circles[i].style.backgroundColor = "red";
+                            circles[i].style.color = "red";
+                            
+                            circles[i].innerHTML = 1;
+                            
+
+                            uitkomst = effechecken(i, circlename, speelbeurt.value);
+
+                            if (parseInt(uitkomst[0]) == 1){
+                                var boodschap = document.getElementById("winst");
+                                boodschap.textContent = "Speler 1 heeft gewonnen"; 
+                                boodschap.style.color = "red";
+
+                                cells[i].style.backgroundColor = "black";  
+                                cells[i].style.opacity = 0.80;
+
+                                if(uitkomst[1]+uitkomst[2]=="ht"){
+                                    huidige_kolom = parseInt(circlename[6]);
+
+                                    for (j=huidige_kolom-1; j>huidige_kolom-parseInt(uitkomst[3])-1; j--){
+                                        var temp = document.getElementsByClassName("c"+j)
+                                        temp[i].style.backgroundColor = "black";
+                                        temp[i].style.opacity = 0.80;
+                                    }
+                                    for (j=huidige_kolom+1; j<huidige_kolom+parseInt(uitkomst[4])+1; j++){
+                                        var temp = document.getElementsByClassName("c"+j)
+                                        temp[i].style.backgroundColor = "black";
+                                        temp[i].style.opacity = 0.80;
+                                    }
+                                }else if(uitkomst[1]+uitkomst[2]=="vt"){
+                                    for (j=i-1; j>i-parseInt(uitkomst[3]); j--){
+                                        cells[j].style.backgroundColor = "black";
+                                        cells[j].style.opacity = 0.80;
+                                    }
+                                    for (j=i+1; j<i+parseInt(uitkomst[4])+1; j++){
+                                        cells[j].style.backgroundColor = "black";
+                                        cells[j].style.opacity = 0.80;
+                                    }
+                                }else if(uitkomst[1]+uitkomst[2]=="dz"){
+                                    huidige_kolom = parseInt(circlename[6]);
+
+                                    for (j=0; j<parseInt(uitkomst[3]); j++){
+                                        index = huidige_kolom-1-j;
+                                        var temp = document.getElementsByClassName("c"+ index)
+                                        temp[i-j-1].style.backgroundColor = "black";
+                                        temp[i-j-1].style.opacity = 0.80;
+                                    }
+                                    for (j=0; j<parseInt(uitkomst[4]); j++){
+                                        index = huidige_kolom+1+j;
+                                        var temp = document.getElementsByClassName("c"+ index)
+                                        temp[i+j+1].style.backgroundColor = "black";
+                                        temp[i+j+1].style.opacity = 0.80;
+                                    }
+                                }else if(uitkomst[1]+uitkomst[2]=="dt"){
+                                    huidige_kolom = parseInt(circlename[6]);
+
+                                    for (j=0; j<parseInt(uitkomst[3]); j++){
+                                        index = huidige_kolom+1+j;
+                                        var temp = document.getElementsByClassName("c"+ index)
+                                        temp[i-j-1].style.backgroundColor = "black";
+                                        temp[i-j-1].style.opacity = 0.80;
+                                    }
+                                    for (j=0; j<parseInt(uitkomst[4]); j++){
+                                        index = huidige_kolom-1-j;
+                                        var temp = document.getElementsByClassName("c"+ index)
+                                        temp[i+j+1].style.backgroundColor = "black";
+                                        temp[i+j+1].style.opacity = 0.80;
+                                    }
+                                }
+
+                                for (j=i-1; j>-1; j--){
+                                    cells[j].style.backgroundColor = "white";
+                                    circles[j].style.backgroundColor = "white";
+                                    circles[j].style.color = "white";
+                                }
+
+                                for (j=0; j<7; j++){
+                                    index = j + 1;
+                                    var temp = document.getElementsByClassName("c"+ index);
+
+                                    for (k=0; k<temp.length; k++){
+                                        temp[k].removeAttribute('onclick')
+                                        temp[k].removeAttribute('onmouseover')
+                                        temp[k].removeAttribute('onmouseout')
+                                    }
+                                }
+                            }
+                            speelbeurt.value=2;
+                        }else{
+                            circles[i].style.backgroundColor = "yellow";
+                            circles[i].style.color = "yellow";
+                            
+                            circles[i].innerHTML = 2;
+
+                            uitkomst = effechecken(i, circlename, speelbeurt.value);
+
+                            if (parseInt(uitkomst[0]) ==1){
+                                var boodschap = document.getElementById("winst");
+                                boodschap.textContent = "Speler 2 heeft gewonnen"; 
+                                boodschap.style.color = "yellow";
+                                
+                                cells[i].style.backgroundColor = "black";  
+                                cells[i].style.opacity = 0.80;
+
+                                if(uitkomst[1]+uitkomst[2]=="ht"){
+                                    huidige_kolom = parseInt(circlename[6]);
+
+                                    for (j=huidige_kolom-1; j>huidige_kolom-parseInt(uitkomst[3])-1; j--){
+                                        var temp = document.getElementsByClassName("c"+j)
+                                        temp[i].style.backgroundColor = "black";
+                                        temp[i].style.opacity = 0.80;
+                                    }
+                                    for (j=huidige_kolom+1; j<huidige_kolom+parseInt(uitkomst[4])+1; j++){
+                                        var temp = document.getElementsByClassName("c"+j)
+                                        temp[i].style.backgroundColor = "black";
+                                        temp[i].style.opacity = 0.80;
+                                    }
+                                }else if(uitkomst[1]+uitkomst[2]=="vt"){
+                                    for (j=i-1; j>i-parseInt(uitkomst[3]); j--){
+                                        cells[j].style.backgroundColor = "black";
+                                        cells[j].style.opacity = 0.80;
+                                    }
+                                    for (j=i+1; j<i+parseInt(uitkomst[4])+1; j++){
+                                        cells[j].style.backgroundColor = "black";
+                                        cells[j].style.opacity = 0.80;
+                                    }
+                                }else if(uitkomst[1]+uitkomst[2]=="dz"){
+                                    huidige_kolom = parseInt(circlename[6]);
+
+                                    for (j=0; j<parseInt(uitkomst[3]); j++){
+                                        index = huidige_kolom-1-j;
+                                        var temp = document.getElementsByClassName("c"+ index)
+                                        temp[i-j-1].style.backgroundColor = "black";
+                                        temp[i-j-1].style.opacity = 0.80;
+                                    }
+                                    for (j=0; j<parseInt(uitkomst[4]); j++){
+                                        index = huidige_kolom+1+j;
+                                        var temp = document.getElementsByClassName("c"+ index)
+                                        temp[i+j+1].style.backgroundColor = "black";
+                                        temp[i+j+1].style.opacity = 0.80;
+                                    }
+                                }else if(uitkomst[1]+uitkomst[2]=="dt"){
+                                    huidige_kolom = parseInt(circlename[6]);
+
+                                    for (j=0; j<parseInt(uitkomst[3]); j++){
+                                        index = huidige_kolom+1+j;
+                                        var temp = document.getElementsByClassName("c"+ index)
+                                        temp[i-j-1].style.backgroundColor = "black";
+                                        temp[i-j-1].style.opacity = 0.80;
+                                    }
+                                    for (j=0; j<parseInt(uitkomst[4]); j++){
+                                        index = huidige_kolom-1-j;
+                                        var temp = document.getElementsByClassName("c"+ index)
+                                        temp[i+j+1].style.backgroundColor = "black";
+                                        temp[i+j+1].style.opacity = 0.80;
+                                    }
+                                }
+
+                                for (j=i-1; j>-1; j--){
+                                    cells[j].style.backgroundColor = "white";
+                                    circles[j].style.backgroundColor = "white";
+                                    circles[j].style.color = "white";
+                                }
+                                
+                                for (j=0; j<7; j++){
+                                    index = j + 1;
+                                    var temp = document.getElementsByClassName("c"+ index);
+
+                                    for (k=0; k<temp.length; k++){
+                                        temp[k].removeAttribute('onclick')
+                                        temp[k].removeAttribute('onmouseover')
+                                        temp[k].removeAttribute('onmouseout')
+                                    }
+                                }
+                            }
+                            speelbeurt.value=1;
+                        }
+                            
+                    } else{
+                        if (i==0){
+                            steen = 0;
+                            alert('Deze rij zit vol, kies een andere rij!')
+                        }
+                    }
+
+                    i--;
+                }
+            }
+
+            function effechecken(rij, kolom, speler){
+
+                //horizontaal checken
+                totaal_steen_horizontaal = 1;
+                bw_ht = 0;
+
+                steen = speler;
+                huidige_kolom = parseInt(kolom[6]) -1;
+                while(steen==speler && huidige_kolom>0){
+                    var circles = document.getElementsByClassName("circle"+huidige_kolom)
+
+                    steen = circles[rij].innerHTML; 
+                    if (steen==speler){
+                        totaal_steen_horizontaal = totaal_steen_horizontaal +1;
+                        bw_ht = bw_ht +1;
+                    }
+
+                    huidige_kolom--
+                }
+
+                fw_ht = 0;
+                steen = speler;
+                huidige_kolom = parseInt(kolom[6]) +1;
+                while(steen==speler && huidige_kolom<8){
+                    var circles = document.getElementsByClassName("circle"+huidige_kolom)
+
+                    steen = circles[rij].innerHTML; 
+                    if (steen==speler){
+                        totaal_steen_horizontaal = totaal_steen_horizontaal +1;
+                        fw_ht = fw_ht +1;
+                    }
+
+                    huidige_kolom++
+                }
+                
+                //verticaal checken        
+                var circles = document.getElementsByClassName(kolom);
+
+                totaal_steen_verticaal = 1;
+                bw_vt = 0;
+
+                steen = speler; 
+                huidige_rij = rij -1;
+                while (steen==speler && huidige_rij>-1){
+
+                    steen = circles[huidige_rij].innerHTML;
+                    if (steen==speler){
+                        totaal_steen_verticaal = totaal_steen_verticaal +1;
+                        bw_vt = bw_vt +1;
+                    }
+
+                    huidige_rij--
+                }
+
+                fw_vt = 0;
+                steen = speler; 
+                huidige_rij = rij +1;
+                while (steen==speler && huidige_rij<6){
+
+                    steen = circles[huidige_rij].innerHTML;
+                    if (steen==speler){
+                        totaal_steen_verticaal = totaal_steen_verticaal +1;
+                        fw_vt = fw_vt +1;
+                    }
+
+                    huidige_rij++   
+                }
+
+                //diagonaal checken zelfde richting
+                totaal_steen_diagonaal_zelfde = 1;
+                bw_dz = 0;
+
+                steen = speler;
+                huidige_kolom = parseInt(kolom[6]) -1;
+                huidige_rij = rij -1;
+                while(steen==speler && huidige_kolom>0 && huidige_rij>-1){
+                    var circles = document.getElementsByClassName("circle"+huidige_kolom)
+
+                    steen = circles[huidige_rij].innerHTML; 
+                    if (steen==speler){
+                        totaal_steen_diagonaal_zelfde = totaal_steen_diagonaal_zelfde +1;
+                        bw_dz = bw_dz+1;
+                    }
+
+                    huidige_kolom--
+                    huidige_rij--
+                }
+
+                fw_dz = 0;
+                steen = speler;
+                huidige_kolom = parseInt(kolom[6]) +1;
+                huidige_rij = rij +1;
+                while(steen==speler && huidige_kolom<8 && huidige_rij<6){
+                    var circles = document.getElementsByClassName("circle"+huidige_kolom)
+
+                    steen = circles[huidige_rij].innerHTML; 
+                    if (steen==speler){
+                        totaal_steen_diagonaal_zelfde = totaal_steen_diagonaal_zelfde +1;
+                        fw_dz = fw_dz +1;
+                    }
+
+                    huidige_kolom++
+                    huidige_rij++
+                }
+
+                //diagonaal checken tegengesteld richting
+                totaal_steen_diagonaal_tegengesteld = 1;
+                bw_dt = 0;
+
+                steen = speler;
+                huidige_kolom = parseInt(kolom[6]) +1;
+                huidige_rij = rij -1;
+                while(steen==speler && huidige_kolom<8 && huidige_rij>-1){
+                    var circles = document.getElementsByClassName("circle"+huidige_kolom)
+
+                    steen = circles[huidige_rij].innerHTML; 
+                    if (steen==speler){
+                        totaal_steen_diagonaal_tegengesteld = totaal_steen_diagonaal_tegengesteld +1;
+                        bw_dt = bw_dt +1;
+                    }
+
+                    huidige_kolom++
+                    huidige_rij--
+                }
+
+                fw_dt = 0;
+                steen = speler;
+                huidige_kolom = parseInt(kolom[6]) -1;
+                huidige_rij = rij +1;
+                while(steen==speler && huidige_kolom>0 && huidige_rij<6){
+                    var circles = document.getElementsByClassName("circle"+huidige_kolom)
+
+                    steen = circles[huidige_rij].innerHTML; 
+                    if (steen==speler){
+                        totaal_steen_diagonaal_tegengesteld = totaal_steen_diagonaal_tegengesteld +1;
+                        fw_dt = fw_dt +1;
+                    }
+
+                    huidige_kolom--
+                    huidige_rij++
+                }
+
+                //Check uitkomst
+                if (totaal_steen_horizontaal >=4){
+                    uitkomst = 1 + "ht" + bw_ht + fw_ht;
+                }else if (totaal_steen_verticaal >=4){
+                    uitkomst =1 + "vt" + bw_vt + fw_vt;
+                }else if (totaal_steen_diagonaal_zelfde >=4){
+                    uitkomst = 1 + "dz" + bw_dz + fw_dz;
+                }else if (totaal_steen_diagonaal_tegengesteld >=4){
+                    uitkomst = 1 + "dt" + bw_dt + fw_dt;  
+                }else{
+                    uitkomst = 0;
+                }
+
+                return  uitkomst;
+            }
+           
+        </script>
+    </head>
+
+    <body>
+        <div class="center"> <b>4 op 'n rij</b> </div>
+
+        <br><br>
+
+        <table>
+            <tr id="r1">
+                <td class="c1" onmouseout="schoonmaken('c1','circle1')" onmouseover="markeren('c1', 'circle1')" 
+                onclick="steenwerpen('c1', 'circle1')">
+                    <span class="circle1">0</span>
+                </td>
+                <td class="c2" onmouseout="schoonmaken('c2','circle2')" onmouseover="markeren('c2','circle2')"
+                onclick="steenwerpen('c2', 'circle2')">
+                    <span class="circle2">0</span></td>
+                <td class="c3" onmouseout="schoonmaken('c3','circle3')" onmouseover="markeren('c3','circle3')"
+                onclick="steenwerpen('c3', 'circle3')">
+                    <span class="circle3">0</span>
+                </td>
+                <td class="c4" onmouseout="schoonmaken('c4','circle4')" onmouseover="markeren('c4','circle4')"
+                onclick="steenwerpen('c4', 'circle4')">
+                    <span class="circle4">0</span>
+                </td>
+                <td class="c5" onmouseout="schoonmaken('c5','circle5')" onmouseover="markeren('c5','circle5')"
+                onclick="steenwerpen('c5', 'circle5')">
+                    <span class="circle5">0</span>
+                </td>
+                <td class="c6" onmouseout="schoonmaken('c6','circle6')" onmouseover="markeren('c6','circle6')"
+                onclick="steenwerpen('c6', 'circle6')">
+                    <span class="circle6">0</span>
+                </td>
+                <td class="c7" onmouseout="schoonmaken('c7','circle7')" onmouseover="markeren('c7','circle7')"
+                onclick="steenwerpen('c7', 'circle7')">
+                    <span class="circle7">0</span>
+                </td>
+            </tr>
+
+            <tr id="r2">
+                <td class="c1" onmouseout="schoonmaken('c1','circle1')" onmouseover="markeren('c1', 'circle1')" 
+                onclick="steenwerpen('c1', 'circle1')">
+                    <span class="circle1">0</span>
+                </td>
+                <td class="c2" onmouseout="schoonmaken('c2','circle2')" onmouseover="markeren('c2','circle2')"
+                onclick="steenwerpen('c2', 'circle2')">
+                    <span class="circle2">0</span></td>
+                <td class="c3" onmouseout="schoonmaken('c3','circle3')" onmouseover="markeren('c3','circle3')"
+                onclick="steenwerpen('c3', 'circle3')">
+                    <span class="circle3">0</span>
+                </td>
+                <td class="c4" onmouseout="schoonmaken('c4','circle4')" onmouseover="markeren('c4','circle4')"
+                onclick="steenwerpen('c4', 'circle4')">
+                    <span class="circle4">0</span>
+                </td>
+                <td class="c5" onmouseout="schoonmaken('c5','circle5')" onmouseover="markeren('c5','circle5')"
+                onclick="steenwerpen('c5', 'circle5')">
+                    <span class="circle5">0</span>
+                </td>
+                <td class="c6" onmouseout="schoonmaken('c6','circle6')" onmouseover="markeren('c6','circle6')"
+                onclick="steenwerpen('c6', 'circle6')">
+                    <span class="circle6">0</span>
+                </td>
+                <td class="c7" onmouseout="schoonmaken('c7','circle7')" onmouseover="markeren('c7','circle7')"
+                onclick="steenwerpen('c7', 'circle7')">
+                    <span class="circle7">0</span>
+                </td>
+            </tr>
+
+            <tr id="r3">
+                <td class="c1" onmouseout="schoonmaken('c1','circle1')" onmouseover="markeren('c1', 'circle1')" 
+                onclick="steenwerpen('c1', 'circle1')">
+                    <span class="circle1">0</span>
+                </td>
+                <td class="c2" onmouseout="schoonmaken('c2','circle2')" onmouseover="markeren('c2','circle2')"
+                onclick="steenwerpen('c2', 'circle2')">
+                    <span class="circle2">0</span></td>
+                <td class="c3" onmouseout="schoonmaken('c3','circle3')" onmouseover="markeren('c3','circle3')"
+                onclick="steenwerpen('c3', 'circle3')">
+                    <span class="circle3">0</span>
+                </td>
+                <td class="c4" onmouseout="schoonmaken('c4','circle4')" onmouseover="markeren('c4','circle4')"
+                onclick="steenwerpen('c4', 'circle4')">
+                    <span class="circle4">0</span>
+                </td>
+                <td class="c5" onmouseout="schoonmaken('c5','circle5')" onmouseover="markeren('c5','circle5')"
+                onclick="steenwerpen('c5', 'circle5')">
+                    <span class="circle5">0</span>
+                </td>
+                <td class="c6" onmouseout="schoonmaken('c6','circle6')" onmouseover="markeren('c6','circle6')"
+                onclick="steenwerpen('c6', 'circle6')">
+                    <span class="circle6">0</span>
+                </td>
+                <td class="c7" onmouseout="schoonmaken('c7','circle7')" onmouseover="markeren('c7','circle7')"
+                onclick="steenwerpen('c7', 'circle7')">
+                    <span class="circle7">0</span>
+                </td>
+            </tr>
+
+            <tr id="r4">
+                <td class="c1" onmouseout="schoonmaken('c1','circle1')" onmouseover="markeren('c1', 'circle1')" 
+                onclick="steenwerpen('c1', 'circle1')">
+                    <span class="circle1">0</span>
+                </td>
+                <td class="c2" onmouseout="schoonmaken('c2','circle2')" onmouseover="markeren('c2','circle2')"
+                onclick="steenwerpen('c2', 'circle2')">
+                    <span class="circle2">0</span></td>
+                <td class="c3" onmouseout="schoonmaken('c3','circle3')" onmouseover="markeren('c3','circle3')"
+                onclick="steenwerpen('c3', 'circle3')">
+                    <span class="circle3">0</span>
+                </td>
+                <td class="c4" onmouseout="schoonmaken('c4','circle4')" onmouseover="markeren('c4','circle4')"
+                onclick="steenwerpen('c4', 'circle4')">
+                    <span class="circle4">0</span>
+                </td>
+                <td class="c5" onmouseout="schoonmaken('c5','circle5')" onmouseover="markeren('c5','circle5')"
+                onclick="steenwerpen('c5', 'circle5')">
+                    <span class="circle5">0</span>
+                </td>
+                <td class="c6" onmouseout="schoonmaken('c6','circle6')" onmouseover="markeren('c6','circle6')"
+                onclick="steenwerpen('c6', 'circle6')">
+                    <span class="circle6">0</span>
+                </td>
+                <td class="c7" onmouseout="schoonmaken('c7','circle7')" onmouseover="markeren('c7','circle7')"
+                onclick="steenwerpen('c7', 'circle7')">
+                    <span class="circle7">0</span>
+                </td>
+            </tr>
+
+            <tr id="r5">
+               <td class="c1" onmouseout="schoonmaken('c1','circle1')" onmouseover="markeren('c1', 'circle1')" 
+                onclick="steenwerpen('c1', 'circle1')">
+                    <span class="circle1">0</span>
+                </td>
+                <td class="c2" onmouseout="schoonmaken('c2','circle2')" onmouseover="markeren('c2','circle2')"
+                onclick="steenwerpen('c2', 'circle2')">
+                    <span class="circle2">0</span></td>
+                <td class="c3" onmouseout="schoonmaken('c3','circle3')" onmouseover="markeren('c3','circle3')"
+                onclick="steenwerpen('c3', 'circle3')">
+                    <span class="circle3">0</span>
+                </td>
+                <td class="c4" onmouseout="schoonmaken('c4','circle4')" onmouseover="markeren('c4','circle4')"
+                onclick="steenwerpen('c4', 'circle4')">
+                    <span class="circle4">0</span>
+                </td>
+                <td class="c5" onmouseout="schoonmaken('c5','circle5')" onmouseover="markeren('c5','circle5')"
+                onclick="steenwerpen('c5', 'circle5')">
+                    <span class="circle5">0</span>
+                </td>
+                <td class="c6" onmouseout="schoonmaken('c6','circle6')" onmouseover="markeren('c6','circle6')"
+                onclick="steenwerpen('c6', 'circle6')">
+                    <span class="circle6">0</span>
+                </td>
+                <td class="c7" onmouseout="schoonmaken('c7','circle7')" onmouseover="markeren('c7','circle7')"
+                onclick="steenwerpen('c7', 'circle7')">
+                    <span class="circle7">0</span>
+                </td>
+            </tr>
+
+            <tr id="r6">
+               <td class="c1" onmouseout="schoonmaken('c1','circle1')" onmouseover="markeren('c1', 'circle1')" 
+                onclick="steenwerpen('c1', 'circle1')">
+                    <span class="circle1">0</span>
+                </td>
+                <td class="c2" onmouseout="schoonmaken('c2','circle2')" onmouseover="markeren('c2','circle2')"
+                onclick="steenwerpen('c2', 'circle2')">
+                    <span class="circle2">0</span></td>
+                <td class="c3" onmouseout="schoonmaken('c3','circle3')" onmouseover="markeren('c3','circle3')"
+                onclick="steenwerpen('c3', 'circle3')">
+                    <span class="circle3">0</span>
+                </td>
+                <td class="c4" onmouseout="schoonmaken('c4','circle4')" onmouseover="markeren('c4','circle4')"
+                onclick="steenwerpen('c4', 'circle4')">
+                    <span class="circle4">0</span>
+                </td>
+                <td class="c5" onmouseout="schoonmaken('c5','circle5')" onmouseover="markeren('c5','circle5')"
+                onclick="steenwerpen('c5', 'circle5')">
+                    <span class="circle5">0</span>
+                </td>
+                <td class="c6" onmouseout="schoonmaken('c6','circle6')" onmouseover="markeren('c6','circle6')"
+                onclick="steenwerpen('c6', 'circle6')">
+                    <span class="circle6">0</span>
+                </td>
+                <td class="c7" onmouseout="schoonmaken('c7','circle7')" onmouseover="markeren('c7','circle7')"
+                onclick="steenwerpen('c7', 'circle7')">
+                    <span class="circle7">0</span>
+                </td>
+            </tr>            
+        </table>
+
+        <br>
+
+        <div id="winst"></div>
+
+    </body>
+</html>
